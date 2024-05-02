@@ -1,1 +1,3 @@
-locust/venv/
+/locust/venv/
+/app/vendor/
+/docker-compose.override.yaml

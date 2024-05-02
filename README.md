@@ -14,4 +14,9 @@ PoC test task to demonstrate high load processing clients checkout
    # alternative - without venv. Installs dependencies globally
    pip install -r requirements.txt
    ```
-2. 
+3. Setup Docker environment
+   ```shell
+   $ docker compose pull
+   $ docker compose build
+   $ docker compose up -d
+   ```
