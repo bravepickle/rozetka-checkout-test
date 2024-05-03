@@ -19,6 +19,8 @@ class CheckoutController implements ControllerInterface
         // TODO: add validation body, if necessary
         $input = $request->body;
         var_dump($input);
+        var_export($input);
+//        var_dump(json_encode($input, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
 //        var_dump($request);
         die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
 

@@ -12,11 +12,16 @@ $container = (new Application())->boot()->container();
 
 $action = $argv[1] ?? 'help';
 switch ($action) {
-    case 'reset':
-        $container->redis()->flushAll();
-        echo 'Redis DB was successfully flushed.' . PHP_EOL;
+    case 'flush':
+        flush_db($container->redis(), $container->db());
         break;
 
+    case 'populate':
+        populate_db($container->db());
+        echo 'All data was successfully populated.' . PHP_EOL;
+        break;
+
+    case 'help':
     default:
         show_help($argv);
 }
@@ -26,13 +31,142 @@ switch ($action) {
  * @param array $argv
  * @return never
  */
-function show_help(array $argv): never {
+function show_help(array $argv): never
+{
     echo 'Run CLI commands' . PHP_EOL;
-    echo $argv[0] . " {help}" . PHP_EOL . PHP_EOL;
+    echo $argv[0] . " {help|reset|populate}" . PHP_EOL . PHP_EOL;
     echo "Commands:" . PHP_EOL;
-    echo "    reset - reset all DBs" . PHP_EOL;
+    echo "    flush - clear all DBs" . PHP_EOL;
+    echo "    populate - populate random data to DBs" . PHP_EOL;
     echo "    help - show help info" . PHP_EOL;
     exit(0);
+}
+
+function flush_db(\Redis $redis, \PDO $db): void {
+    $redis->flushAll();
+    echo 'Redis DB was successfully flushed.' . PHP_EOL;
+
+    $db->exec('SET FOREIGN_KEY_CHECKS=0');
+    $db->exec('TRUNCATE TABLE `products`');
+    $db->exec('TRUNCATE TABLE `product_remainders`');
+    $db->exec('TRUNCATE TABLE `orders`');
+    $db->exec('SET FOREIGN_KEY_CHECKS=1');
+
+    echo 'MySQL DB was successfully cleared.' . PHP_EOL;
+}
+
+function populate_db(PDO $db): void
+{
+    echo 'Populating DBs...' . PHP_EOL;
+    populate_orders($db);
+}
+
+function populate_orders(PDO $db): void {
+    echo 'Loading data for orders...' . PHP_EOL;
+
+    $rand = new \Random\Randomizer();
+
+    $ordersCount = 10000000;
+    $batchSize = 10000;
+    $batch = [];
+
+    $date = date('Y-m-d H:i:s');
+    $orderPayload = json_encode(
+        [
+            'delivery' =>
+                [
+                    'address' => 'future street, 1',
+                    'phone' => '+380999999999',
+                    'email' => 'test@example.com',
+                ],
+            'items' =>
+                [
+                    [
+                        'product_id' => '20',
+                        'count' => '10',
+                    ],
+                ],
+        ],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    );
+    $ordersBaseQuery = 'INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) VALUES ';
+    echo 'Processed: 0';
+    for ($i = 1; $i <= $ordersCount; $i++) {
+        $batch[] = sprintf(
+            "('%s', '%s', '%s', '%s', '%s')",
+            round($rand->getFloat(100, 10000), 2),
+            $orderPayload,
+            $rand->getInt(1, 10),
+            $date,
+            $date
+        );
+
+        if ($i % $batchSize === 0) {
+            $db->exec($ordersBaseQuery . implode(', ', $batch));
+            $batch = [];
+            echo "\rProcessed: " . number_format($i / 1000, thousands_separator: ' ') . 'k';
+        }
+    }
+
+    if ($batch) {
+        $db->exec($ordersBaseQuery . implode(', ', $batch));
+    }
+
+    echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+}
+
+function populate_products(PDO $db): void {
+    echo 'Loading data for products...' . PHP_EOL;
+
+    $rand = new \Random\Randomizer();
+
+    $ordersCount = 10000000;
+    $batchSize = 10000;
+    $batch = [];
+
+    $date = date('Y-m-d H:i:s');
+    $orderPayload = json_encode(
+        [
+            'delivery' =>
+                [
+                    'address' => 'future street, 1',
+                    'phone' => '+380999999999',
+                    'email' => 'test@example.com',
+                ],
+            'items' =>
+                [
+                    [
+                        'product_id' => '20',
+                        'count' => '10',
+                    ],
+                ],
+        ],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+    );
+    $ordersBaseQuery = 'INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) VALUES ';
+    echo 'Processed: 0';
+    for ($i = 1; $i <= $ordersCount; $i++) {
+        $batch[] = sprintf(
+            "('%s', '%s', '%s', '%s', '%s')",
+            round($rand->getFloat(100, 10000), 2),
+            $orderPayload,
+            $rand->getInt(1, 10),
+            $date,
+            $date
+        );
+
+        if ($i % $batchSize === 0) {
+            $db->exec($ordersBaseQuery . implode(', ', $batch));
+            $batch = [];
+            echo "\rProcessed: " . number_format($i / 1000, thousands_separator: ' ') . 'k';
+        }
+    }
+
+    if ($batch) {
+        $db->exec($ordersBaseQuery . implode(', ', $batch));
+    }
+
+    echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
 }
 
 exit(0);

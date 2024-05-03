@@ -21,8 +21,11 @@
         "ext-pdo": "*"
     },
     "scripts": {
+        "app:flush": ["@php bin/console flush"],
+        "app:populate": ["@php bin/console populate"],
         "app:reset": [
-            "@php bin/console reset"
+            "@php bin/console flush",
+            "@php bin/console populate"
         ]
     }
 }
