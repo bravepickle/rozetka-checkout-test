@@ -14,7 +14,7 @@ $_SESSION['time'] = time(); // save something to session
 $_SESSION['action'] = $request->query('action');
 
 try {
-    $response = $container->router()->resolve($request);
+    $response = $container->router()->resolve($request, $container);
 
     header('HTTP/1.1 200 OK');
     header('Content-Type: text/plain; charset=utf-8');

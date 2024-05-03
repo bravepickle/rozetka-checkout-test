@@ -15,10 +15,14 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "php": "^8.3",
         "ext-redis": "*",
-        "php": "^8.3"
+        "ext-pdo_mysql": "*",
+        "ext-pdo": "*"
     },
     "scripts": {
-        "redis:reset": ["@php bin/run_redis reset"]
+        "app:reset": [
+            "@php bin/console reset"
+        ]
     }
 }

@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Contract\ControllerInterface;
 use App\Model\Request;
+use App\Service\Container;
 
 class DefaultController implements ControllerInterface
 {
@@ -13,7 +14,7 @@ class DefaultController implements ControllerInterface
         return true; // supports all
     }
 
-    public function handle(Request $request): ?string
+    public function handle(Request $request, Container $container): ?string
     {
         return 'Welcome!';
     }

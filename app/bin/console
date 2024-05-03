@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 /**
- * Redis DB actions
+ * CLI actions processor
  */
 
 use App\Service\Application;
@@ -10,12 +10,10 @@ require_once __DIR__ . '/../config/bootstrap.php';
 
 $container = (new Application())->boot()->container();
 
-$conn = $container->redis();
-
 $action = $argv[1] ?? 'help';
 switch ($action) {
     case 'reset':
-        $conn->flushAll();
+        $container->redis()->flushAll();
         echo 'Redis DB was successfully flushed.' . PHP_EOL;
         break;
 
@@ -23,8 +21,13 @@ switch ($action) {
         show_help($argv);
 }
 
-function show_help(array $argv) {
-    echo 'Run Redis commands' . PHP_EOL;
+/**
+ * Show help on command usage
+ * @param array $argv
+ * @return never
+ */
+function show_help(array $argv): never {
+    echo 'Run CLI commands' . PHP_EOL;
     echo $argv[0] . " {help}" . PHP_EOL . PHP_EOL;
     echo "Commands:" . PHP_EOL;
     echo "    reset - reset all DBs" . PHP_EOL;

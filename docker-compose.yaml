@@ -27,6 +27,7 @@ services:
             - "./etc/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro"
         depends_on:
             - redis
+            - db
         logging:
             driver: "none"
 
@@ -34,5 +35,17 @@ services:
         image: redis:7.2-alpine3.19
         hostname: redis-db
         container_name: test_redis
+        logging:
+            driver: "none"
+
+    db:
+        image: "percona:8-centos"
+        hostname: "my-db"
+        container_name: "test_db"
+        environment:
+            MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
+            MYSQL_DATABASE: "${DB_NAME}"
+        volumes:
+            - ./etc/percona/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         logging:
             driver: "none"

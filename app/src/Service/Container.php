@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use PDO;
 use Redis;
 
 /**
@@ -10,9 +11,20 @@ use Redis;
  */
 class Container
 {
+    /**
+     * @var Redis|null Redis connections
+     */
     protected ?Redis $redis;
 
+    /**
+     * @var Router Web router
+     */
     protected Router $router;
+
+    /**
+     * @var PDO DB connection
+     */
+    protected PDO $db;
 
     /**
      * Get Redis connection
@@ -38,5 +50,19 @@ class Container
         }
 
         return $this->router;
+    }
+
+    /**
+     * Get MySQL DB connection
+     * @return PDO
+     * @const DB_DSN
+     */
+    public function db(): PDO
+    {
+        if (!isset($this->db)) {
+            $this->db = new PDO(DB_DSN, DB_USER, DB_PASS);
+        }
+
+        return $this->db;
     }
 }
