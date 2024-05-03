@@ -18,6 +18,14 @@ class CheckoutController implements ControllerInterface
     {
         // TODO: add validation body, if necessary
         $input = $request->body;
+
+        $stmt = $container->db()->prepare(
+            "INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) " .
+            "VALUES (:price, :payload, :count, NOW(), NOW())"
+        );
+
+        $stmt->execute(['price' => '100.00', 'payload' => json_encode($input), 'count' => count($input['items'] ?? [])]);
+
         var_dump($input);
         var_export($input);
 //        var_dump(json_encode($input, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));

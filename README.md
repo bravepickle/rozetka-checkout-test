@@ -30,3 +30,8 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] Use event sourcing
 - [ ] Use materialized views or counters copy to Redis DB and sync from time to time to DBMS
 - [ ] Use decrement instead of reading count and writing it
+- [ ] Use task weights in Locust to make race conditions and random results between requests to postmark and other purchases
+- [ ] Diagram for processing requests?
+- [ ] 500MB RAM takes loading products from RDBMS to Redis DB
+- [ ] recover missing products in Redis by checking RDBMS
+- [ ] Research and fix NOTICE: PHP message: PHP Warning:  session_start(): Failed to read session data: redis (path: tcp://redis:6379) in /app/src/Service/Application.php on line 18

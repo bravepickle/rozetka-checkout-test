@@ -18,7 +18,7 @@ switch ($action) {
         break;
 
     case 'populate':
-        populate_db($container->db());
+        populate_db($container->redis(), $container->db());
         echo 'All data was successfully populated.' . PHP_EOL;
         break;
 
@@ -48,7 +48,6 @@ function flush_db(\Redis $redis, \PDO $db): void {
     echo 'Redis DB was successfully flushed.' . PHP_EOL;
 
     $db->exec('SET FOREIGN_KEY_CHECKS=0');
-    $db->exec('TRUNCATE TABLE `products`');
     $db->exec('TRUNCATE TABLE `product_remainders`');
     $db->exec('TRUNCATE TABLE `orders`');
     $db->exec('SET FOREIGN_KEY_CHECKS=1');
@@ -56,11 +55,11 @@ function flush_db(\Redis $redis, \PDO $db): void {
     echo 'MySQL DB was successfully cleared.' . PHP_EOL;
 }
 
-function populate_db(PDO $db): void
+function populate_db(Redis $redis, PDO $db): void
 {
     echo 'Populating DBs...' . PHP_EOL;
     populate_orders($db);
-    populate_products($db);
+    populate_products($redis, $db);
 }
 
 function populate_orders(PDO $db): void {
@@ -117,7 +116,10 @@ function populate_orders(PDO $db): void {
     echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
 }
 
-function populate_products(PDO $db): void {
+/**
+ * @throws RedisException
+ */
+function populate_products(Redis $redis, PDO $db): void {
     echo 'Loading data for products...' . PHP_EOL;
 
     $rand = new Randomizer();
@@ -125,18 +127,23 @@ function populate_products(PDO $db): void {
     $ordersCount = 5000000;
     $batchSize = 10000;
     $batch = [];
+    $redisBatch = []; // TODO: remove me or explain how to share with MySQL db - sync
 
     $date = date('Y-m-d H:i:s');
     $ordersBaseQuery = 'INSERT INTO `product_remainders` (product_id, items_count, updated_at) VALUES ';
     echo 'Processed: 0';
     $foundMarkProduct = false;
     for ($i = 1; $i <= $ordersCount; $i++) {
+        $itemsCount = $i === MARK_PRODUCT_ID ? MARK_PRODUCT_COUNT : $rand->getInt(100, 10000);
+
         $batch[] = sprintf(
             "('%s', '%s', '%s')",
             $i,
-            $i === MARK_PRODUCT_ID ? MARK_PRODUCT_COUNT : round($rand->getFloat(100, 10000), 2),
+            $itemsCount,
             $date,
         );
+
+        $redisBatch['p:' . $i] = $itemsCount;
 
         if ($i === MARK_PRODUCT_ID) {
             $foundMarkProduct = true;
@@ -144,7 +151,9 @@ function populate_products(PDO $db): void {
 
         if ($i % $batchSize === 0) {
             $db->exec($ordersBaseQuery . implode(', ', $batch));
-            $batch = [];
+            $redis->mSet($redisBatch); // add to memory
+
+            $redisBatch = $batch = [];
             echo "\rProcessed: " . number_format($i / 1000, thousands_separator: ' ') . 'k';
         }
     }
