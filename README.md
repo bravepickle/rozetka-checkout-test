@@ -24,3 +24,9 @@ PoC test task to demonstrate high load processing clients checkout
 
 ## TODOs
 - [ ] Cleanup Redis DB
+- [ ] Is it problem with simultaneous reads and writes to same record for product?
+- [ ] Redis Steam customer groups with ACK
+- [ ] When batch process - 100 records per batch - sum up all products and do single update per product_id - grouping
+- [ ] Use event sourcing
+- [ ] Use materialized views or counters copy to Redis DB and sync from time to time to DBMS
+- [ ] Use decrement instead of reading count and writing it

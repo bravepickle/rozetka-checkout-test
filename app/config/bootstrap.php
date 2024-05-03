@@ -16,3 +16,8 @@ define('REDIS_HOST', env('REDIS_HOST', 'redis-db'));
 define('DB_DSN', env('REDIS_HOST', 'mysql:dbname=main_db;host=my-db'));
 define('DB_USER', env('REDIS_HOST', 'root'));
 define('DB_PASS', env('REDIS_HOST', 'Dfoij3FlFLvm?2'));
+
+
+// Postmark product ID
+define('MARK_PRODUCT_ID', (int)env('MARK_PRODUCT_ID', 100));
+define('MARK_PRODUCT_COUNT', (int)env('MARK_PRODUCT_COUNT', 10000));

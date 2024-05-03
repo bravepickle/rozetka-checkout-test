@@ -5,6 +5,7 @@
  */
 
 use App\Service\Application;
+use Random\Randomizer;
 
 require_once __DIR__ . '/../config/bootstrap.php';
 
@@ -59,12 +60,13 @@ function populate_db(PDO $db): void
 {
     echo 'Populating DBs...' . PHP_EOL;
     populate_orders($db);
+    populate_products($db);
 }
 
 function populate_orders(PDO $db): void {
     echo 'Loading data for orders...' . PHP_EOL;
 
-    $rand = new \Random\Randomizer();
+    $rand = new Randomizer();
 
     $ordersCount = 10000000;
     $batchSize = 10000;
@@ -118,42 +120,27 @@ function populate_orders(PDO $db): void {
 function populate_products(PDO $db): void {
     echo 'Loading data for products...' . PHP_EOL;
 
-    $rand = new \Random\Randomizer();
+    $rand = new Randomizer();
 
-    $ordersCount = 10000000;
+    $ordersCount = 5000000;
     $batchSize = 10000;
     $batch = [];
 
     $date = date('Y-m-d H:i:s');
-    $orderPayload = json_encode(
-        [
-            'delivery' =>
-                [
-                    'address' => 'future street, 1',
-                    'phone' => '+380999999999',
-                    'email' => 'test@example.com',
-                ],
-            'items' =>
-                [
-                    [
-                        'product_id' => '20',
-                        'count' => '10',
-                    ],
-                ],
-        ],
-        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-    );
-    $ordersBaseQuery = 'INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) VALUES ';
+    $ordersBaseQuery = 'INSERT INTO `product_remainders` (product_id, items_count, updated_at) VALUES ';
     echo 'Processed: 0';
+    $foundMarkProduct = false;
     for ($i = 1; $i <= $ordersCount; $i++) {
         $batch[] = sprintf(
-            "('%s', '%s', '%s', '%s', '%s')",
-            round($rand->getFloat(100, 10000), 2),
-            $orderPayload,
-            $rand->getInt(1, 10),
+            "('%s', '%s', '%s')",
+            $i,
+            $i === MARK_PRODUCT_ID ? MARK_PRODUCT_COUNT : round($rand->getFloat(100, 10000), 2),
             $date,
-            $date
         );
+
+        if ($i === MARK_PRODUCT_ID) {
+            $foundMarkProduct = true;
+        }
 
         if ($i % $batchSize === 0) {
             $db->exec($ordersBaseQuery . implode(', ', $batch));
@@ -166,7 +153,15 @@ function populate_products(PDO $db): void {
         $db->exec($ordersBaseQuery . implode(', ', $batch));
     }
 
-    echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+    echo sprintf(
+            "\rProcessed: %sk total",
+            number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+
+    if ($foundMarkProduct) {
+        echo 'Product "post mark" found!' . PHP_EOL;
+    } else {
+        echo 'WARNING! Product "post mark" NOT found!' . PHP_EOL;
+    }
 }
 
 exit(0);
