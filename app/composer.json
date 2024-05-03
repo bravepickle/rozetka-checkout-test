@@ -19,6 +19,6 @@
         "php": "^8.3"
     },
     "scripts": {
-        "app:combine": ["@php bin/combine"]
+        "redis:reset": ["@php bin/run_redis reset"]
     }
 }

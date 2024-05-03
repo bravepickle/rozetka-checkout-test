@@ -20,3 +20,7 @@ PoC test task to demonstrate high load processing clients checkout
    $ docker compose build
    $ docker compose up -d
    ```
+
+
+## TODOs
+- [ ] Cleanup Redis DB

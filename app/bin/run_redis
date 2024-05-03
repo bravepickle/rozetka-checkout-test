@@ -1,0 +1,35 @@
+#!/usr/bin/env php
+<?php
+/**
+ * Redis DB actions
+ */
+
+use App\Service\Application;
+
+require_once __DIR__ . '/../config/bootstrap.php';
+
+$container = (new Application())->boot()->container();
+
+$conn = $container->redis();
+
+$action = $argv[1] ?? 'help';
+switch ($action) {
+    case 'reset':
+        $conn->flushAll();
+        echo 'Redis DB was successfully flushed.' . PHP_EOL;
+        break;
+
+    default:
+        show_help($argv);
+}
+
+function show_help(array $argv) {
+    echo 'Run Redis commands' . PHP_EOL;
+    echo $argv[0] . " {help}" . PHP_EOL . PHP_EOL;
+    echo "Commands:" . PHP_EOL;
+    echo "    reset - reset all DBs" . PHP_EOL;
+    echo "    help - show help info" . PHP_EOL;
+    exit(0);
+}
+
+exit(0);
