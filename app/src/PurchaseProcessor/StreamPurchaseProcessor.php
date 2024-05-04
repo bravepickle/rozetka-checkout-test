@@ -78,13 +78,15 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
             throw new HttpExhaustedException('Missing enough items in inventory to fulfill your order');
         }
 
+        // TODO: add cronjob to sync from redis to db and visa versa
+
         return 'Processed order successfully in stream mode';
     }
 
     protected function save(Redis $redis, array $updateData): array
     {
         // Redis transaction
-        $multi = $redis->multi();
+        $multi = $redis->pipeline();
         foreach ($updateData as $productKey => $count) {
             $multi->decrBy($productKey, $count); // highly concurrent processes values taken from db cannot be used
         }
