@@ -34,11 +34,28 @@ class Container
     public function redis(): Redis
     {
         if (!isset($this->redis)) {
-            $this->redis = new Redis(['host' => REDIS_HOST, 'port' => REDIS_PORT]);
+            $maxAttempts = 4;
+            $attempts = 0;
+            $connected = false;
+            do {
+                ++$attempts;
+                try {
+                    $this->redis = new Redis(['host' => REDIS_HOST, 'port' => REDIS_PORT]);
 
-            if (REDIS_PASS) {
-                $this->redis->auth(REDIS_PASS);
-            }
+                    if (REDIS_PASS) {
+                        $this->redis->auth(REDIS_PASS);
+                    }
+
+                    $connected = true;
+                } catch (\RedisException $e) {
+                    if ($attempts >= $maxAttempts) {
+                        throw $e; // forward exception above
+                    }
+
+                    sleep(1);
+                }
+            } while (!$connected && $attempts < $maxAttempts);
+
         }
 
         return $this->redis;

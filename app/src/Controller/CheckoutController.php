@@ -48,7 +48,7 @@ class CheckoutController implements ControllerInterface
         // TODO: pass to events session id and cleanup on success?
         // TODO: expire sessions
 
-        if ($request->query('session_stop', true)) {
+        if ($request->query('session_stop', true) && session_status() === PHP_SESSION_ACTIVE) {
             session_destroy(); // processing request finished, cleanup session resources
         }
 
