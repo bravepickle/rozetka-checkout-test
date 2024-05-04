@@ -15,6 +15,9 @@ define('APP_ROOT', dirname(__DIR__));
 define('APP_LOG',env('APP_LOG', null));
 
 define('REDIS_HOST', env('REDIS_HOST', 'redis-db'));
+define('REDIS_PORT', (int)env('REDIS_PORT', 6379));
+define('REDIS_PASS', env('REDIS_PASS', null));
+
 define('DB_DSN', env('REDIS_HOST', 'mysql:dbname=main_db;host=my-db'));
 define('DB_USER', env('REDIS_HOST', 'root'));
 define('DB_PASS', env('REDIS_HOST', 'Dfoij3FlFLvm?2'));

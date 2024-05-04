@@ -29,11 +29,16 @@ class Container
     /**
      * Get Redis connection
      * @return Redis
+     * @throws \RedisException
      */
     public function redis(): Redis
     {
         if (!isset($this->redis)) {
-            $this->redis = new Redis(['host' => REDIS_HOST]);
+            $this->redis = new Redis(['host' => REDIS_HOST, 'port' => REDIS_PORT]);
+
+            if (REDIS_PASS) {
+                $this->redis->auth(REDIS_PASS);
+            }
         }
 
         return $this->redis;
