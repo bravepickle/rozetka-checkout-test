@@ -60,4 +60,5 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] Redis socket issue - server went away
 - [ ] Redis disable persistance to file save ""
 - [ ] use Redis on host machine instead
+- [ ] docker network issues - redis server has gone away even though it works
 
