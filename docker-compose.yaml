@@ -6,6 +6,8 @@ services:
             -   "${WEB_PORT}:80"
         hostname: nginx
         container_name: test_nginx
+        depends_on:
+            - php
         volumes:
             - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
             - "./etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
