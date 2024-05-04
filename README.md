@@ -34,4 +34,6 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] Diagram for processing requests?
 - [ ] 500MB RAM takes loading products from RDBMS to Redis DB
 - [ ] recover missing products in Redis by checking RDBMS
-- [ ] Research and fix NOTICE: PHP message: PHP Warning:  session_start(): Failed to read session data: redis (path: tcp://redis:6379) in /app/src/Service/Application.php on line 18
+- [ ] Close session and remove info after processing purchase
+- [ ] php session config review and update
+- [ ] use Redis for caching sessions
