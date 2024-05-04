@@ -1,0 +1,33 @@
+[mysqld]
+#skip-host-cache
+skip-name-resolve
+
+# allow remote access
+bind-address = 0.0.0.0
+
+explicit_defaults_for_timestamp = 1
+innodb_use_native_aio = 0
+
+# Disabling symbolic-links is recommended to prevent assorted security risks
+#symbolic-links=0
+skip-external-locking
+key_buffer_size = 128M
+max_allowed_packet = 16M
+table_open_cache = 1024
+sort_buffer_size = 2M
+read_buffer_size = 2M
+read_rnd_buffer_size = 8M
+myisam_sort_buffer_size = 64M
+thread_cache_size = 8
+#query_cache_size = 32M
+
+#long_query_time=1
+#slow-query-log
+
+innodb_buffer_pool_size = 1G
+innodb_log_buffer_size = 4M
+innodb_flush_log_at_trx_commit = 0
+innodb_flush_method=O_DIRECT
+
+max_connections = 600
+max_connect_errors  = 10000

@@ -67,8 +67,8 @@ function populate_orders(PDO $db): void {
 
     $rand = new Randomizer();
 
-    $ordersCount = 10000000;
-    $batchSize = 10000;
+    $ordersCount = FIXTURE_ORDERS_SIZE;
+    $batchSize = FIXTURE_BATCH_SIZE;
     $batch = [];
 
     $date = date('Y-m-d H:i:s');
@@ -90,6 +90,7 @@ function populate_orders(PDO $db): void {
         ],
         JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
     );
+
     $ordersBaseQuery = 'INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) VALUES ';
     echo 'Processed: 0';
     for ($i = 1; $i <= $ordersCount; $i++) {
@@ -124,8 +125,8 @@ function populate_products(Redis $redis, PDO $db): void {
 
     $rand = new Randomizer();
 
-    $ordersCount = 5000000;
-    $batchSize = 10000;
+    $ordersCount = FIXTURE_ORDERS_SIZE;
+    $batchSize = FIXTURE_BATCH_SIZE;
     $batch = [];
     $redisBatch = []; // TODO: remove me or explain how to share with MySQL db - sync
 
