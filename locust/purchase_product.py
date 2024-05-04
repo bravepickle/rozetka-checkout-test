@@ -4,6 +4,7 @@ from locust import HttpUser, task, between, tag
 POSTMARK_ID = 100
 
 class PostmarkHunter(HttpUser):
+    weight = 100 # make this request 100 times more often than the other
 #     host = 'http://127.0.0.1:8181'
 
 #     wait_time = 5
@@ -13,7 +14,7 @@ class PostmarkHunter(HttpUser):
     @tag('postmark_user') # all tasks for postmark hunter
     @tag('simple_mode') # simple mode for handling purchase requests
     @tag('session_stop') # simple mode for handling purchase requests
-    @task(100) # make this request 100 times more often than the other tasks with value of 1 (default)
+    @task
     def make_purchase(self):
         # authenticate user
         id = uuid.uuid4()
@@ -29,6 +30,7 @@ class PostmarkHunter(HttpUser):
         })
 
 class RegularCustomer(HttpUser):
+    weight = 1
 #     host = 'http://127.0.0.1:8181'
 
 #     wait_time = 5

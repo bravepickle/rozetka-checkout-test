@@ -56,7 +56,7 @@ class CheckoutController implements ControllerInterface
             session_destroy(); // processing request finished, cleanup session resources
         }
 
-        return $response . ': ' . $_SESSION['username'];
+        return $response . ': ' . $_SESSION['username'] . PHP_EOL;
 
 //        var_dump($input);
 //        var_export($response);

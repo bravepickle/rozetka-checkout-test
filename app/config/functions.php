@@ -25,7 +25,7 @@ function env(string $name, mixed $default = null): mixed {
  */
 function log_error(string $message, array $context = []): void
 {
-    if (!defined('APP_LOG') && !APP_LOG) {
+    if (!defined('APP_LOG') || !APP_LOG) {
         return;
     }
 

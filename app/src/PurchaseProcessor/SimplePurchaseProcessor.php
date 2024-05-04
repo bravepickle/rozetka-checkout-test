@@ -3,8 +3,8 @@
 namespace App\PurchaseProcessor;
 
 use App\Exception\HttpBadRequestException;
+use App\Exception\HttpExhaustedException;
 use PDO;
-use PDOException;
 
 class SimplePurchaseProcessor extends AbstractPurchaseProcessor
 {
@@ -34,16 +34,6 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
             throw new HttpBadRequestException('No items to buy were added to order');
         }
 
-//        $productIds = array_map('intval', array_column($input['items'], 'product_id'));
-//        $counts = array_map('intval', array_column($input['items'], 'count'));
-
-
-//        foreach ($counts as $key => $count) {
-//            if ($count <= 0) {
-//                throw new HttpClientException('Ordered items count must be greater than 0');
-//            }
-//        }
-
         $db = $this->container->db();
 
         $found = $db->query(
@@ -61,7 +51,7 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
         foreach ($found as $productRemainder) {
             if ($productRemainder['items_count'] <= 0 ||
                 $productRemainder['items_count'] < $products[$productRemainder['product_id']]) {
-                throw new HttpBadRequestException('Missing enough items in inventory to fulfill your order');
+                throw new HttpExhaustedException('Missing enough items in inventory to fulfill your order');
             }
         }
 

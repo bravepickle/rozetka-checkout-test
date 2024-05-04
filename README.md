@@ -44,4 +44,5 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] 2mln new unique users per hour thats a lot. Need partitioning and clusters
 - [ ] exhausted list - show 418 status code to differ from other
 - [ ] show added orders, counters offset, reset dbs
+- [ ] regular vs postmark hunter
 
