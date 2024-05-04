@@ -3,15 +3,17 @@ services:
     nginx:
         image: nginx:alpine3.19
         ports:
-            -   "8080:80"
+            -   "${WEB_PORT}:80"
         hostname: nginx
         container_name: test_nginx
+        depends_on:
+            - php
         volumes:
-            - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro"
-            - "./etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
+            - "./etc/nginx/default.conf:/etc/nginx/conf.d/default.conf"
+            - "./etc/nginx/nginx.conf:/etc/nginx/nginx.conf"
             - "./app/public:/app/public"
         logging:
-            driver: "none"
+            driver: "local"
 
     php:
         build:
@@ -29,14 +31,14 @@ services:
             - redis
             - db
         logging:
-            driver: "none"
+            driver: "local"
 
     redis:
         image: redis:7.2-alpine3.19
         hostname: redis-db
         container_name: test_redis
         logging:
-            driver: "none"
+            driver: "local"
 
     db:
         image: "percona:8-centos"
@@ -46,6 +48,7 @@ services:
             MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASS}"
             MYSQL_DATABASE: "${DB_NAME}"
         volumes:
+            - ./etc/percona/docker.cnf:/etc/my.cnf.d/docker.cnf:ro
             - ./etc/percona/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
         logging:
-            driver: "none"
+            driver: "local"

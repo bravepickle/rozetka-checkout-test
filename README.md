@@ -16,9 +16,8 @@ PoC test task to demonstrate high load processing clients checkout
    ```
 3. Setup Docker environment
    ```shell
-   $ docker compose pull
-   $ docker compose build
    $ docker compose up -d
+   $ docker compose  exec php composer install 
    ```
 
 
