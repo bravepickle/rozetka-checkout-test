@@ -51,5 +51,7 @@ class Application
         }
 
         ++$_SESSION['api_calls_total'];
+
+        session_write_close(); // close session ASAP to prevent errors with concurrency
     }
 }
