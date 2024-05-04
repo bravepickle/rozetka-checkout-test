@@ -26,13 +26,14 @@ class CheckoutController implements ControllerInterface
     public function handle(Request $request, Container $container): ?string
     {
         if (empty($_SESSION['username'])) {
-            throw new HttpUnauthorizedException();
+            if ($request->query('skip_auth', false)) {
+                $_SESSION['username'] = 'anon.';
+            } else {
+                throw new HttpUnauthorizedException();
+            }
         }
         // TODO: add validation body, if necessary
         $input = $request->body;
-
-//        $db = $container->db();
-//        $this->parseInput($input, $db);
 
         if ($request->query('mode') === 'simple') {
             $processor = new SimplePurchaseProcessor($container);
@@ -40,12 +41,7 @@ class CheckoutController implements ControllerInterface
             $processor = new StreamPurchaseProcessor($container);
         }
 
-//        $db->exec("")
-
-//        var_dump($_SESSION);
-//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
-
+        ignore_user_abort(); // ensure that all script processing will be finished. Risky operation
         $response = $processor->process($input);
 
         // TODO: compare enabled and disabled cleanup sessions
@@ -57,13 +53,5 @@ class CheckoutController implements ControllerInterface
         }
 
         return $response . ': ' . $_SESSION['username'] . PHP_EOL;
-
-//        var_dump($input);
-//        var_export($response);
-////        var_dump(json_encode($input, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE));
-////        var_dump($request);
-//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-//
-//        return sprintf('Authenticated Successfully: %s', $request->body['username'] ?? 'N/A');
     }
 }

@@ -45,5 +45,7 @@ function log_error(string $message, array $context = []): void
         fwrite($fh, $log . PHP_EOL);
     } catch (\Throwable $e) {
         trigger_error('[LOG ERROR] ' . $e->getMessage() . '. Message: ' . $message, E_USER_ERROR);
+    } finally {
+        fclose($fh);
     }
 }

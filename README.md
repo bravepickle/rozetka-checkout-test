@@ -45,4 +45,14 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] exhausted list - show 418 status code to differ from other
 - [ ] show added orders, counters offset, reset dbs
 - [ ] regular vs postmark hunter
+- [ ] PHP message: PHP Warning:  session_start(): Failed to read session data: redis (path: tcp://redis:6379) in /app/src/Service/Application.php on line 43
+- [ ] retry session_start try-catch throwable
+- [ ] items_count can be negative values - needs compensation operation - due to concurrent requests + log event
+- [ ] items_count = items_count - 1 is good but can provide problems without compensation
+- [ ] event sourcing streams fix somewhat problem with compensation - less workers than open connections and predictable, durable
+- [ ] ignore_user_abort() - is important
+- [ ] increase inventory postmark for comparison
+- [ ] RAM must be monitored closely
+- [ ] mysql transactions are important
+- [ ] Redis have various eviction policies when maxmemory-policy is reached
 

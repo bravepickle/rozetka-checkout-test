@@ -26,6 +26,7 @@
         "app:reset": [
             "@php bin/console flush",
             "@php bin/console populate"
-        ]
+        ],
+        "app:process_orders": ["@php bin/console process_orders"]
     }
 }

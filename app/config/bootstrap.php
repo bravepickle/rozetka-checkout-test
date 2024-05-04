@@ -11,7 +11,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/functions.php';
 
 define('APP_ROOT', dirname(__DIR__));
-//define('APP_LOG',env('APP_LOG', 'php://stderr'));
+//define('APP_LOG',env('APP_LOG', 'php://stdout'));
 define('APP_LOG',env('APP_LOG', null));
 
 define('REDIS_HOST', env('REDIS_HOST', 'redis-db'));

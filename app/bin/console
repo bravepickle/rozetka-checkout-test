@@ -4,6 +4,7 @@
  * CLI actions processor
  */
 
+use App\Command\OrderRequestsWorker;
 use App\Service\Application;
 use Random\Randomizer;
 
@@ -22,6 +23,10 @@ switch ($action) {
         echo 'All data was successfully populated.' . PHP_EOL;
         break;
 
+    case 'process_orders':
+        (new OrderRequestsWorker())->run();
+        break;
+
     case 'help':
     default:
         show_help($argv);
@@ -35,10 +40,11 @@ switch ($action) {
 function show_help(array $argv): never
 {
     echo 'Run CLI commands' . PHP_EOL;
-    echo $argv[0] . " {help|reset|populate}" . PHP_EOL . PHP_EOL;
+    echo $argv[0] . " {help|reset|populate|process_orders}" . PHP_EOL . PHP_EOL;
     echo "Commands:" . PHP_EOL;
     echo "    flush - clear all DBs" . PHP_EOL;
     echo "    populate - populate random data to DBs" . PHP_EOL;
+    echo "    process_orders - run worker for processing order requests" . PHP_EOL;
     echo "    help - show help info" . PHP_EOL;
     exit(0);
 }
@@ -136,7 +142,7 @@ function populate_products(Redis $redis, PDO $db): void {
     echo 'Processed: 0';
     $foundMarkProduct = false;
     for ($i = 1; $i <= $ordersCount; $i++) {
-        $itemsCount = $i === MARK_PRODUCT_ID ? MARK_PRODUCT_COUNT : $rand->getInt(100, 10000);
+        $itemsCount = $i === MARK_PRODUCT_ID ? MARK_PRODUCT_COUNT : $rand->getInt(30000, 100000);
 
         $batch[] = sprintf(
             "('%s', '%s', '%s')",

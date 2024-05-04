@@ -14,25 +14,7 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
     #[\Override]
     public function process(?array $data): string
     {
-        // TODO: add HTTP query switch for handling requests in simple form and using Redis Streams
-        if (empty($data['items'])) {
-            throw new HttpBadRequestException('Malformed purchase order request');
-        }
-
-        $products = [];
-        foreach ($data['items'] as $item) {
-            $count = (int)$item['count'];
-
-            if ($count <= 0) {
-                throw new HttpBadRequestException('Ordered items count must be greater than 0');
-            }
-
-            $products[(int)$item['product_id']] = $count;
-        }
-
-        if (!$products) {
-            throw new HttpBadRequestException('No items to buy were added to order');
-        }
+        $products = $this->parseInput($data);
 
         $db = $this->container->db();
 

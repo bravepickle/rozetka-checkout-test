@@ -23,4 +23,33 @@ abstract class AbstractPurchaseProcessor
      * @throws HttpBadRequestException
      */
     abstract public function process(?array $data): string;
+
+    /**
+     * @param array|null $data
+     * @return array<int,int>
+     * @throws HttpBadRequestException
+     */
+    protected function parseInput(?array $data): array
+    {
+        if (empty($data['items'])) {
+            throw new HttpBadRequestException('Malformed purchase order request');
+        }
+
+        $products = [];
+        foreach ($data['items'] as $item) {
+            $count = (int)$item['count'];
+
+            if ($count <= 0) {
+                throw new HttpBadRequestException('Ordered items count must be greater than 0');
+            }
+
+            $products[(int)$item['product_id']] = $count;
+        }
+
+        if (!$products) {
+            throw new HttpBadRequestException('No items to buy were added to order');
+        }
+
+        return $products;
+    }
 }
