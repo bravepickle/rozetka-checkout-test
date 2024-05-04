@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Contract;
 
 use App\Model\Request;
+use App\Service\Container;
 
 /**
  * Controller Interface
@@ -19,7 +21,8 @@ interface ControllerInterface
     /**
      * Handle request
      * @param Request $request
+     * @param Container $container
      * @return string|null
      */
-    public function handle(Request $request): ?string;
+    public function handle(Request $request, Container $container): ?string;
 }

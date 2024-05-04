@@ -15,10 +15,17 @@
     ],
     "minimum-stability": "stable",
     "require": {
+        "php": "^8.3",
         "ext-redis": "*",
-        "php": "^8.3"
+        "ext-pdo_mysql": "*",
+        "ext-pdo": "*"
     },
     "scripts": {
-        "app:combine": ["@php bin/combine"]
+        "app:flush": ["@php bin/console flush"],
+        "app:populate": ["@php bin/console populate"],
+        "app:reset": [
+            "@php bin/console flush",
+            "@php bin/console populate"
+        ]
     }
 }
