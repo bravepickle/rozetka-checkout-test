@@ -75,7 +75,7 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
 //        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
 
 
-        $this->save($db, $found, $products, $data);
+        $this->save($db, $products, $data);
 
         return 'Processed order successfully in simple mode';
 
@@ -85,12 +85,11 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
     /**
      * @param PDO $db
      * @param array<int, int> $products
-     * @param array|null $data
+     * @param array $data
      * @return void
-     * @throws HttpBadRequestException
      * @throws \Throwable
      */
-    public function save(PDO $db, array $products, ?array $data): void
+    public function save(PDO $db, array $products, array $data): void
     {
         try {
             $db->beginTransaction();
@@ -100,19 +99,16 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
                 "UPDATE product_remainders SET items_count = items_count - ? WHERE product_id = ? LIMIT 1",
             );
 
+//            echo '<pre>';
+//            print_r($products);
+//            die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
+
+
             $stmt->bindParam(1, $count, PDO::PARAM_INT);
             $stmt->bindParam(2, $productId, PDO::PARAM_INT);
 
             foreach ($products as $productId => $count) {
                 $stmt->execute();
-//                $db->prepare(
-//                    sprintf(
-//                        "UPDATE product_remainders SET items_count = items_count - '%d' " .
-//                        "WHERE product_id = '%d' LIMIT 1",
-//                        $count,
-//                        $productId,
-//                    )
-//                );
             }
 
             $stmt = $db->prepare(

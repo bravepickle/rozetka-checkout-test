@@ -42,4 +42,6 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] disable nginx access logs?
 - [ ] kafka, rabbitmq as alternative
 - [ ] 2mln new unique users per hour thats a lot. Need partitioning and clusters
+- [ ] exhausted list - show 418 status code to differ from other
+- [ ] show added orders, counters offset, reset dbs
 
