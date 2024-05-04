@@ -15,7 +15,7 @@ class Application
         $this->container = new Container();
 
         if (!$this->isCli()) {
-            session_start(); // init session for web apps always
+            $this->initSession();
         }
 
         return $this;
@@ -33,5 +33,23 @@ class Application
     public function container(): Container
     {
         return $this->container;
+    }
+
+    /**
+     * @return void
+     */
+    public function initSession(): void
+    {
+        session_start(); // init session for web apps always
+
+        // add some tracking info to keep more info on user actions
+        $_SESSION['time'] = time(); // save something to session
+
+        // track number of calls done within single session by a user
+        if (!isset($_SESSION['api_calls_total'])) {
+            $_SESSION['api_calls_total'] = 0;
+        }
+
+        ++$_SESSION['api_calls_total'];
     }
 }

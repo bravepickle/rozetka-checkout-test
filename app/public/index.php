@@ -11,19 +11,6 @@ $container = (new Application())->boot()->container();
 
 $request = RequestParser::makeFromGlobals();
 
-$_SESSION['time'] = time(); // save something to session
-
-// track number of calls done within single session by a user
-if (!isset($_SESSION['api_calls_total'])) {
-    $_SESSION['api_calls_total'] = 0;
-}
-
-++$_SESSION['api_calls_total'];
-
-//$_SESSION['action'] = isset($_SESSION['action']) ?
-//    array_unique(array_merge((array)$_SESSION['action'], [$request->query('action')])) : [$request->query('action')];
-
-
 try {
     $response = $container->router()->resolve($request, $container);
 
@@ -31,21 +18,25 @@ try {
     header('Content-Type: text/plain; charset=utf-8');
 
     echo $response . PHP_EOL;
-} catch (HttpExceptionInterface $exception) {
-    $statusText = $exception->getStatusText();
-    if ($exception->getStatusCode() > 0 && $statusText) {
-        header(sprintf('HTTP/1.1 %d %s', $exception->getStatusCode(), $statusText));
+} catch (HttpExceptionInterface $e) {
+    log_error('[HTTP] ' . $e->getMessage(), ['statusCode' => $e->getStatusCode(), 'file' => $e->getFile(), 'line' => $e->getLine()]);
+
+    $statusText = $e->getStatusText();
+    if ($e->getStatusCode() > 0 && $statusText) {
+        header(sprintf('HTTP/1.1 %d %s', $e->getStatusCode(), $statusText));
     } else {
         header('HTTP/1.1 500 Internal Server Error');
     }
 
     header('Content-Type: text/plain; charset=utf-8');
 
-    echo $exception->getMessage() ?: $exception->getStatusText() . PHP_EOL;
-} catch (\Throwable $exception) {
+    echo $e->getMessage() ?: $e->getStatusText() . PHP_EOL;
+} catch (\Throwable $e) {
+    log_error($e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+
     header('HTTP/1.1 500 Internal Server Error');
     header('Content-Type: text/plain; charset=utf-8');
 
-    echo $exception->getMessage() . PHP_EOL . $exception->getFile() . ':' . $exception->getLine() . PHP_EOL .
-        PHP_EOL . $exception->getTraceAsString();
+    echo $e->getMessage() . PHP_EOL . $e->getFile() . ':' . $e->getLine() . PHP_EOL .
+        PHP_EOL . $e->getTraceAsString();
 }
