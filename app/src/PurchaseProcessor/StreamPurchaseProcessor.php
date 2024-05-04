@@ -2,7 +2,6 @@
 
 namespace App\PurchaseProcessor;
 
-use App\Exception\HttpBadRequestException;
 use App\Exception\HttpExhaustedException;
 use Redis;
 

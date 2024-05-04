@@ -37,6 +37,9 @@ services:
         image: redis:7.2-alpine3.19
         hostname: redis-db
         container_name: test_redis
+        command: "redis-server /usr/local/etc/redis/redis.conf"
+        volumes:
+            - "./etc/redis/redis.conf:/usr/local/etc/redis/redis.conf"
         logging:
             driver: "local"
 

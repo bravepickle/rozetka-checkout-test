@@ -16,7 +16,8 @@ class PostmarkHunter(HttpUser):
         # authenticate user
         id = uuid.uuid4()
         # send purchase request
-        with self.client.post("/index.php?action=purchase&mode=stream&session_stop=0&skip_auth=1&mark=1",
+#         with self.client.post("/index.php?action=purchase&mode=stream&session_stop=0&skip_auth=1&mark=1",
+        with self.client.post("/index.php?action=purchase&mode=stream&session_stop=1&skip_auth=1&mark=1",
             data={
                 'delivery[address]': 'some address %s' % id,
                 'delivery[phone]': '+380' + ''.join(random.sample(string.digits, 9)),
