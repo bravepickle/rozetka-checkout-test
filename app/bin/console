@@ -114,7 +114,8 @@ function populate_orders(PDO $db): void {
         $db->exec($ordersBaseQuery . implode(', ', $batch));
     }
 
-    echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+//    echo sprintf("\rProcessed: %sk total", number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+    echo sprintf("\rProcessed: %s total", number_format($ordersCount, thousands_separator: ' ')) . PHP_EOL;
 }
 
 /**
@@ -125,7 +126,7 @@ function populate_products(Redis $redis, PDO $db): void {
 
     $rand = new Randomizer();
 
-    $ordersCount = FIXTURE_ORDERS_SIZE;
+    $ordersCount = FIXTURE_PRODUCTS_SIZE;
     $batchSize = FIXTURE_BATCH_SIZE;
     $batch = [];
     $redisBatch = []; // TODO: remove me or explain how to share with MySQL db - sync
@@ -161,11 +162,16 @@ function populate_products(Redis $redis, PDO $db): void {
 
     if ($batch) {
         $db->exec($ordersBaseQuery . implode(', ', $batch));
+        $redis->mSet($redisBatch); // add to memory
     }
 
+//    echo sprintf(
+//            "\rProcessed: %sk total",
+//            number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+
     echo sprintf(
-            "\rProcessed: %sk total",
-            number_format($ordersCount / 1000, thousands_separator: ' ')) . PHP_EOL;
+            "\rProcessed: %s total",
+            number_format($ordersCount, thousands_separator: ' ')) . PHP_EOL;
 
     if ($foundMarkProduct) {
         echo 'Product "post mark" found!' . PHP_EOL;
