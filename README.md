@@ -22,7 +22,7 @@ PoC test task to demonstrate high load processing clients checkout
 
 
 ## TODOs
-- [ ] Cleanup Redis DB
+- [X] Cleanup Redis DB
 - [ ] Is it problem with simultaneous reads and writes to same record for product?
 - [ ] Redis Steam customer groups with ACK
 - [ ] When batch process - 100 records per batch - sum up all products and do single update per product_id - grouping
@@ -36,3 +36,10 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] Close session and remove info after processing purchase
 - [ ] php session config review and update
 - [ ] use Redis for caching sessions
+- [ ] use Locust tags to switch strategies for handling requests for comparison
+- [ ] fsync on read/write RDBMS, cookies, sessions
+- [ ] review all todos and fixmes in code
+- [ ] disable nginx access logs?
+- [ ] kafka, rabbitmq as alternative
+- [ ] 2mln new unique users per hour thats a lot. Need partitioning and clusters
+

@@ -16,6 +16,10 @@ class AuthController implements ControllerInterface
 
     public function handle(Request $request, Container $container): ?string
     {
-        return sprintf('Authenticated Successfully %s', $request->body['username'] ?? 'N/A');
+        $_SESSION['username'] = $request->body['username'] ?? 'anonymous';
+
+//        print_r(['sess' => $_SESSION, 'cookie' => $_COOKIE, 'session_id' => session_id()]);
+
+        return sprintf('Authenticated Successfully: %s', $_SESSION['username']);
     }
 }
