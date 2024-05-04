@@ -3,7 +3,7 @@ services:
     nginx:
         image: nginx:alpine3.19
         ports:
-            -   "8080:80"
+            -   "${WEB_PORT}:80"
         hostname: nginx
         container_name: test_nginx
         volumes:
