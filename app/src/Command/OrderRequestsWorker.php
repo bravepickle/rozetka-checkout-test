@@ -44,6 +44,7 @@ class OrderRequestsWorker
                 }
 
                 $this->processResults($redis, $db, $group, $data);
+                unset($data);
 
                 echo '+'; // processed batch successfully
             } catch (\Throwable $e) {
@@ -72,9 +73,6 @@ class OrderRequestsWorker
         if (!$data) {
             return;
         }
-//        var_dump($data);
-
-        // TODO: check if enough inventory
 
         $insertStmt = $db->prepare(
             "INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) " .
@@ -121,13 +119,12 @@ class OrderRequestsWorker
                 }
 
                 // TODO: validate counts available and non zero
-
-//                var_dump([$id => $item, 'parsed' => $payload, 'products' => $products]);
-
                 $savedKeys[] = $id;
+                unset($productUpdates);
             }
 
             $redis->xAck($selStream, $group, $savedKeys);
+            unset($savedKeys);
         }
     }
 

@@ -27,6 +27,6 @@
             "@php bin/console flush",
             "@php bin/console populate"
         ],
-        "app:process_orders": ["@php bin/console process_orders"]
+        "app:process_orders": ["@php -d memory_limit='2G' bin/console process_orders"]
     }
 }

@@ -22,12 +22,10 @@ class RedisPurchaseProcessor extends AbstractPurchaseProcessor
 
         $redis = $this->container->redis();
 
-        $keyProductMap = [];
         $productKeyMap = [];
         $productIds = [];
         foreach ($inputProducts as $productId => $count) {
             $productKeyMap[$productId] = 'p:' . $productId;
-            $keyProductMap['p:' . $productId] = (int)$productId;
             $productIds[] = $productId;
         }
 
