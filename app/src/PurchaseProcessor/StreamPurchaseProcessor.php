@@ -50,6 +50,8 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
             ]
         );
 
+//        $redis->incr('requests_total:stream');
+
         $redis->close(); // close ASAP
 
         // TODO: add cronjob to sync from redis to db and visa versa

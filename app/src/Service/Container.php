@@ -40,7 +40,12 @@ class Container
             do {
                 ++$attempts;
                 try {
-                    $this->redis = new Redis(['host' => REDIS_HOST, 'port' => REDIS_PORT, 'auth' => REDIS_PASS]);
+                    $this->redis = new Redis([
+                        'host' => REDIS_HOST,
+                        'port' => REDIS_PORT,
+                        'auth' => REDIS_PASS,
+                        'persistent' => false,
+                    ]);
 
                     $connected = true;
                 } catch (\RedisException $e) {
