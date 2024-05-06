@@ -42,25 +42,4 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
 
         return 'Processed order successfully in stream mode';
     }
-
-    protected function save(Redis $redis, array $updateData): array
-    {
-        // Redis transaction
-        $multi = $redis->pipeline();
-        foreach ($updateData as $productKey => $count) {
-            $multi->decrBy($productKey, $count); // highly concurrent processes values taken from db cannot be used
-        }
-
-        return $multi->exec();
-    }
-
-    protected function rollbackRedisTransaction(Redis $redis, array $updateData): array
-    {
-        $multi = $redis->multi();
-        foreach ($updateData as $productKey => $count) {
-            $multi->incrBy($productKey, $count); // compensate previous decrement
-        }
-
-        return $multi->exec();
-    }
 }

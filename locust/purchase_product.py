@@ -7,8 +7,8 @@ class PostmarkHunter(HttpUser):
     weight = 100  # make this request 100 times more often than the other
     #     wait_time = between(4, 5)
 
-    wait_time = between(1, 2)
-#     wait_time = between(4, 5)
+#     wait_time = between(1, 2)
+    wait_time = between(4, 5)
 
     @tag('stream_mode')  # stream mode for handling purchase requests
     @tag('skip_auth')  # do not make auth requests. Only purchase requests

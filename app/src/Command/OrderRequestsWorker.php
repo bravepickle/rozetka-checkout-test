@@ -2,7 +2,6 @@
 
 namespace App\Command;
 
-use App\Exception\HttpExhaustedException;
 use App\Service\Container;
 use JsonException;
 use PDO;
@@ -12,8 +11,8 @@ use RedisException;
 class OrderRequestsWorker
 {
     protected const int BATCH_SIZE = 100;
-//    protected const int BLOCK_TIME = 1000;
-    protected const int BLOCK_TIME = 0;
+    protected const int BLOCK_TIME = 10000;
+//    protected const int BLOCK_TIME = 0;
 
 
     public function __construct(private Container $container)
@@ -21,10 +20,16 @@ class OrderRequestsWorker
     }
 
 
-    protected function info(string $message): void
+    protected function logInfo(string $message): void
     {
         // TODO: use logger. Its for debug only
         echo '[INFO] ' . $message . PHP_EOL;
+    }
+
+    protected function logError(string $message): void
+    {
+        // TODO: use logger. Its for debug only
+        echo '[ERROR] ' . $message . PHP_EOL;
     }
 
     public function run(string $stream, string $group, string $consumer): void
@@ -50,18 +55,19 @@ class OrderRequestsWorker
 
                 $this->processResults($redis, $db, $group, $data);
 
+                echo '+'; // processed batch successfully
             } catch (\Throwable $e) {
                 echo '[ERROR] ' . $e->getMessage() . PHP_EOL;
-                log_error($e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+                $this->logError($e->getMessage());
+
+                echo '-'; // failure
             }
         }
-
-        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
     }
 
     /**
      * @param Redis $redis
+     * @param PDO $db
      * @param string $group
      * @param array<array{
      *      delivery: array{address: string, phone: string, email: string},
@@ -76,11 +82,10 @@ class OrderRequestsWorker
         if (!$data) {
             return;
         }
-        var_dump($data);
+//        var_dump($data);
 
         // TODO: check if enough inventory
 
-//        $insertOrdersQuery = "INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) ";
         $insertStmt = $db->prepare(
             "INSERT INTO `orders` (price_total, payload, items_count, created_at, updated_at) " .
             "VALUES (:price, :payload, :count, NOW(), NOW())"
@@ -88,11 +93,8 @@ class OrderRequestsWorker
 
         foreach ($data as $selStream => $items) {
             $savedKeys = [];
-//            $productUpdates = [];
-//            $orderId = null;
-//            $productOrderMap = [];
-
             foreach ($items as $id => $item) {
+//                $this->logInfo(sprintf('Event: %s', json_encode($item)));
                 $payload = json_decode(
                     $item['payload'],
                     true,
@@ -106,41 +108,18 @@ class OrderRequestsWorker
                 ]);
 
                 $orderId = $db->lastInsertId();
-
-//                var_dump(['order id' => $orderId]);
-//                die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
-
-//                $this->makePurchase($payload, $productUpdates);
-
                 $products = $this->parseProducts($payload);
                 $productUpdates = [];
 
                 // combine results
                 foreach ($products as $prodId => $count) {
                     $productUpdates['p:' . $prodId] = $count;
-//                    $productOrderMap[$prodId] = $orderId;
-//                    if (!isset($productUpdates[$prodId])) {
-//                        $productUpdates[$prodId] = $count;
-//                    } else {
-//                        $productUpdates[$prodId] += $count;
-//                    }
                 }
-
-//                $this->makePurchase($payload, $productUpdates);
 
                 $result = $this->saveRemainders($redis, $productUpdates);
 
-//                var_dump(['incremented' => $result]);
-//            die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
-
                 // did we exceed inventory capacity due to high concurrency operations?
                 if (min($result) < 0) {
-
-//                    var_dump($result);
-//                    die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
                     $this->rollbackRedisTransaction($redis, $productUpdates);
 
                     if ($orderId) {
@@ -154,51 +133,18 @@ class OrderRequestsWorker
 
                 // TODO: validate counts available and non zero
 
-                var_dump([$id => $item, 'parsed' => $payload, 'products' => $products]);
+//                var_dump([$id => $item, 'parsed' => $payload, 'products' => $products]);
 
                 $savedKeys[] = $id;
             }
 
-//            $result = $this->saveRemainders($redis, $productUpdates);
-//
-//            var_dump(['incremented' => $result]);
-////            die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-//
-//
-//            // did we exceed inventory capacity due to high concurrency operations?
-//            if (min($result) < 0) {
-//                $this->rollbackRedisTransaction($redis, $productUpdates);
-//
-//                if ($orderId) {
-//                    $db->exec(
-//                            'UPDATE `orders` SET status ="cancelled", ' .
-//                            'updated_at = NOW() WHERE id = ' . (int)$orderId
-//                    );
-//                }
-//                // TODO: notify system worker that we reached below zero
-//            }
-
-            // make batch product updates grouped by product
-
-            echo "now check pending!" . PHP_EOL;
-
-            sleep(30);
-
             $redis->xAck($selStream, $group, $savedKeys);
-
         }
-
-        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
     }
 
     protected function calcPriceTotal(array $data): string
     {
         return '100.00'; // stub. No real data provided
-    }
-
-    protected function makePurchase(array $data, array &$productUpdates): void
-    {
-        $products = $this->parseProducts($data);
     }
 
     protected function parseProducts(array $data): array
