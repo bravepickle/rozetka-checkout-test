@@ -37,21 +37,9 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
             }
         }
 
-//        var_dump($products);
-//        var_dump($data);
-//        var_dump($found);
-//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-//
-//
-//
-//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
-
         $this->save($db, $products, $data);
 
         return 'Processed order successfully in simple mode';
-
-//        $products = array_map('intval', array_column($input['items'], 'product_id'));
     }
 
     /**
@@ -70,11 +58,6 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
             $stmt = $db->prepare(
                 "UPDATE product_remainders SET items_count = items_count - ? WHERE product_id = ? LIMIT 1",
             );
-
-//            echo '<pre>';
-//            print_r($products);
-//            die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
 
             $stmt->bindParam(1, $count, PDO::PARAM_INT);
             $stmt->bindParam(2, $productId, PDO::PARAM_INT);

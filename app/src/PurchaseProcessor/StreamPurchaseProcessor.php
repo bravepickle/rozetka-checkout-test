@@ -15,68 +15,28 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
     #[\Override]
     public function process(?array $data): string
     {
-        $inputProducts = $this->parseInput($data);
+        $this->parseInput($data);
+
+        // TODO: check if enough inventory
+//        var_dump($data);
+//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
 
         $redis = $this->container->redis();
 
-        $keyProductMap = [];
-        $productKeyMap = [];
-        $productIds = [];
-        foreach ($inputProducts as $productId => $count) {
-            $productKeyMap[$productId] = 'p:' . $productId;
-            $keyProductMap['p:' . $productId] = (int)$productId;
-            $productIds[] = $productId;
-        }
+        // TODO: add data
+        $redis->xAdd(
+            STREAM_NAME,
+            '*',
+            [
+                'uid' => $_SESSION['username'],
+                'payload' => json_encode(
+                    $data,
+                    JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES
+                ),
+            ]
+        );
 
-        $found = $redis->mGet($productKeyMap);
-
-        $updateData = [];
-        $missingProductIds = [];
-        $foundKeyValues = [];
-        foreach ($found as $index => $count) {
-            $productId = $productIds[$index];
-            if ($count === false) {
-                $missingProductIds[] = $productId;
-            } else {
-                $updateData[$productKeyMap[$productId]] = $inputProducts[$productId];
-                $foundKeyValues[$productKeyMap[$productId]] = (int)$count;
-            }
-        }
-
-        if ($missingProductIds) {
-            // FIXME: send to queue missing products in redis
-            throw new \LogicException('Processing missing product ids in Redis is not implemented');
-
-            // TODO: try reading from mysql db - as a temporary fallback
-//        $db = $this->container->db();
-//
-//        $found = $db->query(
-//            sprintf(
-//                'SELECT product_id, items_count from product_remainders WHERE product_id IN (%s)',
-//                implode(', ', array_keys($products))
-//            )
-//        )->fetchAll(PDO::FETCH_ASSOC);
-        }
-
-        if (!$updateData) {
-            throw new \LogicException('Failed to process products in the order');
-        }
-
-        foreach ($updateData as $productKey => $count) {
-            if ($count <= 0 || $foundKeyValues[$productKey] < $count) {
-                throw new HttpExhaustedException('Missing enough items in inventory to fulfill your order');
-            }
-        }
-
-        $result = $this->save($redis, $updateData);
-
-        // did we exceed inventory capacity due to high concurrency operations?
-        if (min($result) < 0) {
-            $this->rollbackRedisTransaction($redis, $updateData);
-            // TODO: notify system worker that we reached below zero
-
-            throw new HttpExhaustedException('Missing enough items in inventory to fulfill your order');
-        }
+        $redis->close(); // close ASAP
 
         // TODO: add cronjob to sync from redis to db and visa versa
 

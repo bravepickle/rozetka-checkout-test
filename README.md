@@ -55,7 +55,7 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] RAM must be monitored closely
 - [ ] mysql transactions are important
 - [ ] Redis have various eviction policies when maxmemory-policy is reached
-- [ ] session_write_close call ASAP
+- [ ] session_write_close, db, redis connections, close asap call ASAP
 - [ ] separate Redis DB with sessions and policy on exhaustion
 - [ ] Redis socket issue - server went away
 - [ ] Redis disable persistance to file save ""

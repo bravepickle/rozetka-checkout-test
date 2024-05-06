@@ -24,7 +24,8 @@ switch ($action) {
         break;
 
     case 'process_orders':
-        (new OrderRequestsWorker())->run();
+        (new OrderRequestsWorker($container))
+            ->run($argv[2] ?? STREAM_NAME, $argv[2] ?? STREAM_GROUP, $argv[3] ?? STREAM_CONSUMER);
         break;
 
     case 'help':

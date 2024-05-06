@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Contract\ControllerInterface;
 use App\Exception\HttpUnauthorizedException;
 use App\Model\Request;
+use App\PurchaseProcessor\RedisPurchaseProcessor;
 use App\PurchaseProcessor\SimplePurchaseProcessor;
 use App\PurchaseProcessor\StreamPurchaseProcessor;
 use App\Service\Container;
@@ -35,8 +36,11 @@ class CheckoutController implements ControllerInterface
         // TODO: add validation body, if necessary
         $input = $request->body;
 
-        if ($request->query('mode') === 'simple') {
+        $mode = $request->query('mode');
+        if ($mode === 'simple') {
             $processor = new SimplePurchaseProcessor($container);
+        } elseif ($mode === 'redis') {
+            $processor = new RedisPurchaseProcessor($container);
         } else {
             $processor = new StreamPurchaseProcessor($container);
         }
