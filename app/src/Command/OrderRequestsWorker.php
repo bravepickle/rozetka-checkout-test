@@ -13,6 +13,21 @@ class OrderRequestsWorker
     protected const int BATCH_SIZE = 100;
 
     /**
+     * @var int
+     */
+    protected int $processed;
+
+    /**
+     * @var int
+     */
+    protected int $succeeded;
+
+    /**
+     * @var int
+     */
+    protected int $failed;
+
+    /**
      * Timeout 10 seconds 1000msec = 1sec
      */
     protected const int BLOCK_TIME = 10000;
@@ -29,6 +44,7 @@ class OrderRequestsWorker
 
     public function run(string $stream, string $group, string $consumer): void
     {
+        $this->succeeded = $this->failed = $this->processed = 0;
         $redis = $this->container->redis();
         $db = $this->container->db();
 
@@ -39,21 +55,29 @@ class OrderRequestsWorker
                 $data = $redis->xReadGroup($group, $consumer, [$stream => '>'], self::BATCH_SIZE, self::BLOCK_TIME);
 
                 if (!$data) {
-                    echo '.';
+                    echo "\nWaiting...\n";
+//                    echo '.';
                     continue;
                 }
 
                 $this->processResults($redis, $db, $group, $data);
                 unset($data);
 
-                echo '+'; // processed batch successfully
+//                echo '+'; // processed batch successfully
             } catch (\Throwable $e) {
                 // TODO: log errors
                 //$this->logError($e->getMessage());
 
-                echo '-'; // failure
+//                echo '-'; // failure
             }
+
+            $this->showSummary();
         }
+    }
+
+    protected function showSummary(): void
+    {
+        echo "\rOrders: processed - $this->processed, succeeded - $this->succeeded, failed - $this->failed";
     }
 
     /**
@@ -82,6 +106,8 @@ class OrderRequestsWorker
         foreach ($data as $selStream => $items) {
             $savedKeys = [];
             foreach ($items as $id => $item) {
+                ++$this->processed;
+
                 $payload = json_decode(
                     $item['payload'],
                     true,
@@ -115,7 +141,11 @@ class OrderRequestsWorker
                             'updated_at = NOW() WHERE id = ' . (int)$orderId
                         );
                     }
+
+                    ++$this->failed;
                     // TODO: notify system worker that we reached below zero
+                } else {
+                    ++$this->succeeded;
                 }
 
                 // TODO: validate counts available and non zero

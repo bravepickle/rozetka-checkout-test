@@ -19,7 +19,16 @@ PoC test task to demonstrate high load processing clients checkout
    $ docker compose up -d
    $ docker compose  exec php composer install 
    ```
-
+4. Run tests (each command in separate terminal)
+   ```shell
+   # reset DBs
+   docker compose exec php sh -c 'composer run app:reset'
+   # start worker
+   docker compose exec php composer run app:process_orders
+   # start locust UI performance testing suite
+   locust -f purchase_product.py --host http://localhost:8181 \
+      --tags stream_mode skip_auth --users 5500 -t 2m -r 3000 PostmarkHunter
+   ```
 
 ## TODOs
 - [X] Cleanup Redis DB
@@ -66,4 +75,7 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] push from redis to RDBMS all counter values 
 - [ ] networking interfaces & docker can be stuck
 - [ ] simultaneous writes to single record
+
+
+- [ ] 
 

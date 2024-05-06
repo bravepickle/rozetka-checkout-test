@@ -1,5 +1,5 @@
 import uuid, random, string
-from locust import HttpUser, task, between, tag
+from locust import HttpUser, task, between, tag, constant_throughput
 
 POSTMARK_ID = 100
 
@@ -8,7 +8,8 @@ class PostmarkHunter(HttpUser):
     #     wait_time = between(4, 5)
 
 #     wait_time = between(1, 2)
-    wait_time = between(4, 5)
+#     wait_time = between(4, 5)
+    wait_time = constant_throughput(0.1)
 
     @tag('stream_mode')  # stream mode for handling purchase requests
     @tag('skip_auth')  # do not make auth requests. Only purchase requests
