@@ -62,4 +62,8 @@ PoC test task to demonstrate high load processing clients checkout
 - [ ] use Redis on host machine instead
 - [ ] docker network issues - redis server has gone away even though it works
 - [ ] docker compose issues - stuck db, redis, php containers
+- [ ] virtualized env is bad idea for testing high load
+- [ ] push from redis to RDBMS all counter values 
+- [ ] networking interfaces & docker can be stuck
+- [ ] simultaneous writes to single record
 

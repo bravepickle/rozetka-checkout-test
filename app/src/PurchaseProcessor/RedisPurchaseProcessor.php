@@ -3,6 +3,7 @@
 namespace App\PurchaseProcessor;
 
 use App\Exception\HttpExhaustedException;
+use LogicException;
 use Redis;
 use RedisException;
 use Throwable;
@@ -47,7 +48,7 @@ class RedisPurchaseProcessor extends AbstractPurchaseProcessor
 
         if ($missingProductIds) {
             // FIXME: send to queue missing products in redis
-            throw new \LogicException('Processing missing product ids in Redis is not implemented');
+            throw new LogicException('Processing missing product ids in Redis is not implemented');
 
             // TODO: try reading from mysql db - as a temporary fallback
 //        $db = $this->container->db();
@@ -61,7 +62,7 @@ class RedisPurchaseProcessor extends AbstractPurchaseProcessor
         }
 
         if (!$updateData) {
-            throw new \LogicException('Failed to process products in the order');
+            throw new LogicException('Failed to process products in the order');
         }
 
         foreach ($updateData as $productKey => $count) {

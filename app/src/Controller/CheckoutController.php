@@ -4,12 +4,15 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Contract\ControllerInterface;
+use App\Exception\HttpBadRequestException;
 use App\Exception\HttpUnauthorizedException;
 use App\Model\Request;
 use App\PurchaseProcessor\RedisPurchaseProcessor;
 use App\PurchaseProcessor\SimplePurchaseProcessor;
 use App\PurchaseProcessor\StreamPurchaseProcessor;
 use App\Service\Container;
+use RedisException;
+use Throwable;
 
 class CheckoutController implements ControllerInterface
 {
@@ -23,6 +26,9 @@ class CheckoutController implements ControllerInterface
      * @param Container $container
      * @return string|null
      * @throws HttpUnauthorizedException
+     * @throws HttpBadRequestException
+     * @throws RedisException
+     * @throws Throwable
      */
     public function handle(Request $request, Container $container): ?string
     {
@@ -33,6 +39,7 @@ class CheckoutController implements ControllerInterface
                 throw new HttpUnauthorizedException();
             }
         }
+
         // TODO: add validation body, if necessary
         $input = $request->body;
 

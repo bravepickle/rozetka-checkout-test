@@ -2,9 +2,6 @@
 
 namespace App\PurchaseProcessor;
 
-use App\Exception\HttpExhaustedException;
-use Redis;
-
 class StreamPurchaseProcessor extends AbstractPurchaseProcessor
 {
     /**
@@ -18,9 +15,6 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
         $this->parseInput($data);
 
         // TODO: check if enough inventory
-//        var_dump($data);
-//        die(implode(':', [__METHOD__, __FILE__, __LINE__]) . PHP_EOL);
-
         $redis = $this->container->redis();
 
         // TODO: add data

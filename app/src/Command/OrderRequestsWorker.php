@@ -11,19 +11,14 @@ use RedisException;
 class OrderRequestsWorker
 {
     protected const int BATCH_SIZE = 100;
-    protected const int BLOCK_TIME = 10000;
-//    protected const int BLOCK_TIME = 0;
 
+    /**
+     * Timeout 10 seconds 1000msec = 1sec
+     */
+    protected const int BLOCK_TIME = 10000;
 
     public function __construct(private Container $container)
     {
-    }
-
-
-    protected function logInfo(string $message): void
-    {
-        // TODO: use logger. Its for debug only
-        echo '[INFO] ' . $message . PHP_EOL;
     }
 
     protected function logError(string $message): void
@@ -34,18 +29,13 @@ class OrderRequestsWorker
 
     public function run(string $stream, string $group, string $consumer): void
     {
-//        > XGROUP CREATE race:italy italy_riders $ MKSTREAM
-//OK
         $redis = $this->container->redis();
         $db = $this->container->db();
 
-//        $redis->xGroup('CREATE', $stream, $group, $consumer, true, '$');
         $redis->xGroup('CREATE', $stream, $group, '$', true);
-//        $redis->rawCommand("XGROUP CREATE $stream $group $ MKSTREAM");
 
         while (true) {
             try {
-//            xreadgroup group france_riders John count 1 block 0 streams race:france >
                 $data = $redis->xReadGroup($group, $consumer, [$stream => '>'], self::BATCH_SIZE, self::BLOCK_TIME);
 
                 if (!$data) {
@@ -57,8 +47,8 @@ class OrderRequestsWorker
 
                 echo '+'; // processed batch successfully
             } catch (\Throwable $e) {
-                echo '[ERROR] ' . $e->getMessage() . PHP_EOL;
-                $this->logError($e->getMessage());
+                // TODO: log errors
+                //$this->logError($e->getMessage());
 
                 echo '-'; // failure
             }
@@ -94,7 +84,6 @@ class OrderRequestsWorker
         foreach ($data as $selStream => $items) {
             $savedKeys = [];
             foreach ($items as $id => $item) {
-//                $this->logInfo(sprintf('Event: %s', json_encode($item)));
                 $payload = json_decode(
                     $item['payload'],
                     true,

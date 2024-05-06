@@ -31,6 +31,7 @@ define('FIXTURE_ORDERS_SIZE', (int)env('FIXTURE_ORDERS_SIZE', 10000000));
 define('FIXTURE_PRODUCTS_SIZE', (int)env('FIXTURE_PRODUCTS_SIZE', 5000000));
 define('FIXTURE_BATCH_SIZE', (int)env('FIXTURE_BATCH_SIZE', 10000));
 
+// Redis Streams settings
 define('STREAM_NAME', 'product:orders');
 define('STREAM_GROUP', 'purchase');
 define('STREAM_CONSUMER', 'worker');

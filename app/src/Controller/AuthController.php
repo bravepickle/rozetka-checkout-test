@@ -18,8 +18,6 @@ class AuthController implements ControllerInterface
     {
         $_SESSION['username'] = $request->body['username'] ?? 'anonymous';
 
-//        print_r(['sess' => $_SESSION, 'cookie' => $_COOKIE, 'session_id' => session_id()]);
-
         return sprintf('Authenticated Successfully: %s', $_SESSION['username']);
     }
 }

@@ -5,19 +5,19 @@ namespace App\PurchaseProcessor;
 use App\Exception\HttpBadRequestException;
 use App\Exception\HttpExhaustedException;
 use PDO;
+use Throwable;
 
 class SimplePurchaseProcessor extends AbstractPurchaseProcessor
 {
     /**
      * @inheritDoc
+     * @throws Throwable
      */
     #[\Override]
     public function process(?array $data): string
     {
         $products = $this->parseInput($data);
-
         $db = $this->container->db();
-
         $found = $db->query(
             sprintf(
                 'SELECT product_id, items_count from product_remainders WHERE product_id IN (%s)',
@@ -47,7 +47,7 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
      * @param array<int, int> $products
      * @param array $data
      * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function save(PDO $db, array $products, array $data): void
     {
@@ -74,7 +74,7 @@ class SimplePurchaseProcessor extends AbstractPurchaseProcessor
             $stmt->execute(['price' => '100.00', 'payload' => json_encode($data), 'count' => count($products)]);
 
             $db->commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $db->rollBack();
 
             throw $e;
