@@ -50,11 +50,9 @@ class StreamPurchaseProcessor extends AbstractPurchaseProcessor
             ]
         );
 
-//        $redis->incr('requests_total:stream');
+        $redis->incr('requests_total:stream'); // for debugging purposes only
 
         $redis->close(); // close ASAP
-
-        // TODO: add cronjob to sync from redis to db and visa versa
 
         return 'Processed order successfully in stream mode';
     }

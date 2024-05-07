@@ -74,14 +74,10 @@ class RedisPurchaseProcessor extends AbstractPurchaseProcessor
         // did we exceed inventory capacity due to high concurrency operations?
         if (min($result) < 0) {
             $this->rollbackRedisTransaction($redis, $updateData);
-            // TODO: notify system worker that we reached below zero
-
             throw new HttpExhaustedException('Missing enough items in inventory to fulfill your order');
         }
 
         $redis->close(); // close connection ASAP
-
-        // TODO: add cronjob to sync from redis to db and visa versa
 
         return 'Processed order successfully in redis mode';
     }

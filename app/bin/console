@@ -136,7 +136,7 @@ function populate_products(Redis $redis, PDO $db): void {
     $ordersCount = FIXTURE_PRODUCTS_SIZE;
     $batchSize = FIXTURE_BATCH_SIZE;
     $batch = [];
-    $redisBatch = []; // TODO: remove me or explain how to share with MySQL db - sync
+    $redisBatch = [];
 
     $date = date('Y-m-d H:i:s');
     $ordersBaseQuery = 'INSERT INTO `product_remainders` (product_id, items_count, updated_at) VALUES ';

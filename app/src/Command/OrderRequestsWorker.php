@@ -32,16 +32,20 @@ class OrderRequestsWorker
      */
     protected const int BLOCK_TIME = 10000;
 
-    public function __construct(private Container $container)
+    /**
+     * @param Container $container
+     */
+    public function __construct(private readonly Container $container)
     {
     }
 
-    protected function logError(string $message): void
-    {
-        // TODO: use logger. Its for debug only
-        echo '[ERROR] ' . $message . PHP_EOL;
-    }
-
+    /**
+     * @param string $stream
+     * @param string $group
+     * @param string $consumer
+     * @return void
+     * @throws RedisException
+     */
     public function run(string $stream, string $group, string $consumer): void
     {
         $this->succeeded = $this->failed = $this->processed = 0;
@@ -65,8 +69,7 @@ class OrderRequestsWorker
 
 //                echo '+'; // processed batch successfully
             } catch (\Throwable $e) {
-                // TODO: log errors
-                //$this->logError($e->getMessage());
+                //log_error($e->getMessage());
 
 //                echo '-'; // failure
             }
@@ -143,12 +146,10 @@ class OrderRequestsWorker
                     }
 
                     ++$this->failed;
-                    // TODO: notify system worker that we reached below zero
                 } else {
                     ++$this->succeeded;
                 }
 
-                // TODO: validate counts available and non zero
                 $savedKeys[] = $id;
                 unset($productUpdates);
             }
@@ -181,7 +182,6 @@ class OrderRequestsWorker
 
     protected function saveRemainders(Redis $redis, array $updateData): array
     {
-        // TODO: compare to MySQL saves
         // Redis transaction
         $multi = $redis->pipeline();
         foreach ($updateData as $productKey => $count) {

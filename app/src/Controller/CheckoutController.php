@@ -40,7 +40,6 @@ class CheckoutController implements ControllerInterface
             }
         }
 
-        // TODO: add validation body, if necessary
         $input = $request->body;
 
         $mode = $request->query('mode');
@@ -54,10 +53,6 @@ class CheckoutController implements ControllerInterface
 
         ignore_user_abort(); // ensure that all script processing will be finished. Risky operation
         $response = $processor->process($input);
-
-        // TODO: compare enabled and disabled cleanup sessions
-        // TODO: pass to events session id and cleanup on success?
-        // TODO: expire sessions
 
         if ($request->query('session_stop', true) && session_status() === PHP_SESSION_ACTIVE) {
             session_destroy(); // processing request finished, cleanup session resources
