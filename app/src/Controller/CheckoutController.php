@@ -32,15 +32,19 @@ class CheckoutController implements ControllerInterface
      */
     public function handle(Request $request, Container $container): ?string
     {
+        $input = $request->body;
+
         if (empty($_SESSION['username'])) {
             if ($request->query('skip_auth', false)) {
-                $_SESSION['username'] = 'anon.';
+                $_SESSION['username'] = 'anon.'; // skip authentication process
+            } elseif (!empty($input['username'])) {
+                $_SESSION['username'] = $input['username']; // imitation of authentication
             } else {
                 throw new HttpUnauthorizedException();
             }
         }
 
-        $input = $request->body;
+        session_write_close(); // close session ASAP to prevent errors with concurrency
 
         $mode = $request->query('mode');
         if ($mode === 'simple') {
