@@ -1,0 +1,32 @@
+{
+    "name": "bravepickle/rozetka-checkout-test",
+    "description": "PoC test task to demonstrate high load processing clients checkout",
+    "type": "project",
+    "license": "Apache 2.0",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bravepickle"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.3",
+        "ext-redis": "*",
+        "ext-pdo_mysql": "*",
+        "ext-pdo": "*"
+    },
+    "scripts": {
+        "app:flush": ["@php bin/console flush"],
+        "app:populate": ["@php bin/console populate"],
+        "app:reset": [
+            "@php bin/console flush",
+            "@php bin/console populate"
+        ],
+        "app:process_orders": ["@php -d memory_limit='2G' bin/console process_orders"]
+    }
+}
