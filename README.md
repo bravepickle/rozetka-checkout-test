@@ -8,7 +8,7 @@ PoC test task to demonstrate high load processing clients checkout
    ```shell
    cd locust
    python3 -m venv venv
-   source source venv/bin/activate
+   source venv/bin/activate
    pip install -r requirements.txt
    
    # alternative - without venv. Installs dependencies globally
@@ -17,7 +17,7 @@ PoC test task to demonstrate high load processing clients checkout
 3. Setup Docker environment
    ```shell
    $ docker compose up -d
-   $ docker compose  exec php composer install 
+   $ docker compose exec php composer install 
    ```
 4. Run tests (each command in separate terminal)
    ```shell
